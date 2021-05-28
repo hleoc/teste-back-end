@@ -1,9 +1,17 @@
 require("dotenv/config");
-const MongoClient = require('mongodb').MongoClient;
 
-const uri = process.env.MONGO_WEB;
-const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-client.connect((err: any) => {
-  const collection = client.db(process.env.MONGO_DB_DATABASE).collection("users");
-  client.close();
-});
+import { MongoClient } from "mongodb";
+
+const DB_NAME = "Teddy";
+const MONGO_DB_URL = process.env.MONGO_WEB || `mongodb://localhost:27017/${DB_NAME}`;
+let connection: MongoClient;
+
+export const getCollection = async (collectionName: string) => {
+  connection =
+    connection ||
+    (await MongoClient.connect(MONGO_DB_URL, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    }));
+  return connection.db(DB_NAME).collection(collectionName);
+};
